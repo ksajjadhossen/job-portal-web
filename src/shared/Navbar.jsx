@@ -9,15 +9,13 @@ const Navbar = () => {
   const items = (
     <>
       <li>
-        <Link to="/register">Register</Link>
+        <Link to="/">Home</Link>
       </li>
       <li>
-        <details>
-          <summary>Parent</summary>
-        </details>
+        <Link to="/">Home</Link>
       </li>
       <li>
-        <a>Item 3</a>
+        <Link to="/">Home</Link>
       </li>
     </>
   );

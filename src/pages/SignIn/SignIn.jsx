@@ -4,6 +4,7 @@ import logInLottie from "../../assets/lotties/Login and Sign up.json";
 import { use } from "react";
 import { AuthContext } from "../../contexts/AuthContext/AuthContext";
 import { Link } from "react-router";
+import SocialLogin from "../../assets/components/SocialLogin";
 
 const SignIn = () => {
   const { signInUser } = use(AuthContext);
@@ -62,6 +63,8 @@ const SignIn = () => {
                 SignIn
               </button>
             </form>
+
+            <SocialLogin></SocialLogin>
           </div>
         </div>
       </div>
