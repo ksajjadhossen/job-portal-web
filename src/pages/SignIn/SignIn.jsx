@@ -3,11 +3,14 @@ import React from "react";
 import logInLottie from "../../assets/lotties/Login and Sign up.json";
 import { use } from "react";
 import { AuthContext } from "../../contexts/AuthContext/AuthContext";
-import { Link } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import SocialLogin from "../../assets/components/SocialLogin";
 
 const SignIn = () => {
   const { signInUser } = use(AuthContext);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const from = location.state || "/";
   const handleSignIn = (e) => {
     e.preventDefault();
     const email = e.target.email.value;
@@ -16,6 +19,7 @@ const SignIn = () => {
     signInUser(email, password)
       .then((result) => {
         console.log(result.user);
+        navigate(from);
       })
       .catch((error) => {
         console.log(error);
@@ -64,7 +68,7 @@ const SignIn = () => {
               </button>
             </form>
 
-            <SocialLogin></SocialLogin>
+            <SocialLogin from={from}></SocialLogin>
           </div>
         </div>
       </div>
