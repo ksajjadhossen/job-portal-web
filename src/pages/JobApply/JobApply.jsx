@@ -1,20 +1,39 @@
+import React from "react";
 import { use } from "react";
 import { useLoaderData, useNavigate, useParams } from "react-router";
 import { AuthContext } from "../../contexts/AuthContext/AuthContext";
+import axios from "axios";
+import Swal from "sweetalert2";
 
 const JobApply = () => {
   const { id } = useParams();
   const { user } = use(AuthContext);
-  console.log(user);
-  const job = useLoaderData(); // Assuming you pass job title/company via loader
+  const job = useLoaderData();
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData.entries());
+    (data.job_id = id), (data.applicant = user.email);
+
+    axios
+      .post("http://localhost:3000/application", data)
+      .then(
+        (res) => console.log(res),
+
+        Swal.fire({
+          title: "Application successful",
+          icon: "success",
+          draggable: true,
+        })
+      )
+
+      .catch((err) => console.log(err));
+
+    // Note: If you are uploading a real file to a server,
+    // you should use the raw formData instead of converting to an object.
     console.log("Application Data:", data);
-    // Add your submission logic here
   };
 
   return (
@@ -36,32 +55,26 @@ const JobApply = () => {
         {/* Form Card */}
         <div className="bg-[#111827] border border-gray-800 shadow-2xl rounded-2xl p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Personal Info Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">
-                  Full Name
-                </label>
+            {/* Resume / Portfolio Link */}
+            <div className="pt-4">
+              <label className="block text-sm font-medium text-gray-400 mb-2">
+                Resume URL (Google Drive/Dropbox)
+              </label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-500">
+                  📄
+                </span>
                 <input
-                  type="text"
-                  name="name"
+                  type="url"
+                  name="resume"
                   required
-                  placeholder="John Doe"
-                  className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+                  placeholder="https://drive.google.com/your-resume-link"
+                  className="w-full bg-gray-900 border border-gray-700 rounded-xl pl-10 pr-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-all"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  placeholder="john@example.com"
-                  className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
-                />
-              </div>
+              <p className="text-xs text-gray-500 mt-2 italic">
+                * Please ensure the link is public so recruiters can view it.
+              </p>
             </div>
 
             {/* Social Links Section */}
@@ -93,29 +106,18 @@ const JobApply = () => {
                     className="w-full bg-gray-900 border border-gray-700 rounded-xl pl-24 pr-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-all"
                   />
                 </div>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">
-                    Portfolio
-                  </span>
-                  <input
-                    type="url"
-                    name="portfolio"
-                    placeholder="https://yourwebsite.com"
-                    className="w-full bg-gray-900 border border-gray-700 rounded-xl pl-24 pr-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-all"
-                  />
-                </div>
               </div>
             </div>
 
-            {/* Resume / Cover Letter */}
+            {/* Cover Letter */}
             <div className="pt-4">
               <label className="block text-sm font-medium text-gray-400 mb-2">
-                Why should we hire you? (Cover Letter)
+                Why should we hire you?
               </label>
               <textarea
                 name="message"
                 rows="4"
-                placeholder="Briefly describe your experience and interest..."
+                placeholder="Briefly describe your experience..."
                 className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-all resize-none"
               ></textarea>
             </div>
