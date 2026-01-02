@@ -133,6 +133,7 @@ const JobApply = () => {
               </button>
               <button
                 type="submit"
+                onClick={() => navigate("/")}
                 className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 hover:shadow-[0_0_20px_rgba(37,99,235,0.3)] transition-all active:scale-95"
               >
                 Submit Application

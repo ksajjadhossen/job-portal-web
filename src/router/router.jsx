@@ -9,6 +9,7 @@ import { AuthContext } from "../contexts/AuthContext/AuthContext";
 import PrivateRoutes from "../routes/PrivateRoutes";
 import JobApply from "../pages/JobApply/JobApply";
 import MyApplications from "../pages/MyApplications/MyApplications";
+import AddJob from "../pages/AddJob/AddJob";
 
 const router = createBrowserRouter([
   {
@@ -42,6 +43,14 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoutes>
             <MyApplications></MyApplications>
+          </PrivateRoutes>
+        ),
+      },
+      {
+        path: "/addJob",
+        element: (
+          <PrivateRoutes>
+            <AddJob></AddJob>
           </PrivateRoutes>
         ),
       },

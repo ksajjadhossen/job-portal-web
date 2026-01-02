@@ -19,6 +19,13 @@ const Navbar = () => {
         )}
       </li>
       <li>
+        {user && (
+          <>
+            <Link to="/addJob">Add Job</Link>
+          </>
+        )}
+      </li>
+      <li>
         <Link to="/">Home</Link>
       </li>
     </>
