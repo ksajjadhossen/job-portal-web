@@ -2,13 +2,14 @@ import React, { useState } from "react";
 
 const MultiStepJobForm = () => {
   const [step, setStep] = useState(1);
+
   const [formData, setFormData] = useState({
     title: "",
     location: "",
     jobType: "Full-Time",
     category: "",
     applicationDeadline: "",
-    salaryRange: { min: 0, max: 0, currency: "bdt" },
+    salaryRange: { min: "", max: "", currency: "bdt" },
     description: "",
     company: "",
     requirements: "",
@@ -18,26 +19,77 @@ const MultiStepJobForm = () => {
     company_logo: "",
   });
 
-  const nextStep = () => setStep((prev) => prev + 1);
+  /* ---------------- STEP VALIDATION ---------------- */
+  const nextStep = () => {
+    if (step === 1) {
+      const { title, location, category, applicationDeadline } = formData;
+      if (!title || !location || !category || !applicationDeadline) {
+        alert("Please fill all Job Basic fields");
+        return;
+      }
+    }
+
+    if (step === 2) {
+      const { description, requirements, responsibilities, salaryRange } =
+        formData;
+
+      if (
+        !description ||
+        !requirements ||
+        !responsibilities ||
+        !salaryRange.min ||
+        !salaryRange.max
+      ) {
+        alert("Please complete Job Details properly");
+        return;
+      }
+
+      if (Number(salaryRange.min) > Number(salaryRange.max)) {
+        alert("Min salary cannot be greater than Max salary");
+        return;
+      }
+    }
+
+    setStep((prev) => prev + 1);
+  };
+
   const prevStep = () => setStep((prev) => prev - 1);
 
+  /* ---------------- FINAL SUBMIT ---------------- */
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const { company, hr_name, hr_email } = formData;
+    if (!company || !hr_name || !hr_email) {
+      alert("Please fill Company & HR information");
+      return;
+    }
+
     const finalData = {
       ...formData,
-      requirements: formData.requirements.split(",").map((s) => s.trim()),
+      salaryRange: {
+        ...formData.salaryRange,
+        min: Number(formData.salaryRange.min),
+        max: Number(formData.salaryRange.max),
+      },
+      requirements: formData.requirements
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean),
       responsibilities: formData.responsibilities
         .split(",")
-        .map((s) => s.trim()),
+        .map((s) => s.trim())
+        .filter(Boolean),
     };
+
     console.log("Final Job Data:", finalData);
     alert("Job Posted Successfully!");
   };
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-base-200 rounded-xl shadow-xl my-10">
-      {/* --- Progress Stats Header --- */}
-      <div className="flex items-center w-full justify-center mb-10">
+      {/* Progress Header */}
+      <div className="flex items-center justify-center mb-10">
         <div className="stats shadow bg-base-100 w-full">
           <div className={`stat ${step >= 1 ? "text-primary" : ""}`}>
             <div className="stat-title">Step 1</div>
@@ -56,318 +108,215 @@ const MultiStepJobForm = () => {
 
       <form
         onSubmit={handleSubmit}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && step !== 3) e.preventDefault();
+        }}
         className="bg-base-100 p-10 rounded-lg shadow-sm"
       >
-        {/* STEP 1: BASIC INFO */}
+        {/* STEP 1 */}
         {step === 1 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-fadeIn">
-            <h2 className="col-span-2 text-2xl font-bold mb-2 border-b pb-2">
+            <h2 className="col-span-2 text-2xl font-bold border-b pb-2">
               Job Basics
             </h2>
 
-            <div className="form-control w-full">
-              <label htmlFor="title" className="label font-semibold">
-                Job Title
-              </label>
-              <input
-                id="title"
-                type="text"
-                placeholder="Enter Job Title"
-                className="input input-bordered focus:input-primary"
-                onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
-                value={formData.title}
-              />
-            </div>
+            <input
+              className="input input-bordered"
+              placeholder="Job Title"
+              value={formData.title}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
+            />
 
-            <div className="form-control w-full">
-              <label htmlFor="location" className="label font-semibold">
-                Location
-              </label>
-              <input
-                id="location"
-                type="text"
-                placeholder="Enter Job Location"
-                className="input input-bordered focus:input-primary"
-                onChange={(e) =>
-                  setFormData({ ...formData, location: e.target.value })
-                }
-                value={formData.location}
-              />
-            </div>
+            <input
+              className="input input-bordered"
+              placeholder="Location"
+              value={formData.location}
+              onChange={(e) =>
+                setFormData({ ...formData, location: e.target.value })
+              }
+            />
 
-            <div className="form-control w-full">
-              <label htmlFor="jobType" className="label font-semibold">
-                Job Type
-              </label>
-              <select
-                id="jobType"
-                className="select select-bordered focus:select-primary"
-                onChange={(e) =>
-                  setFormData({ ...formData, jobType: e.target.value })
-                }
-                value={formData.jobType}
-              >
-                <option>Full-Time</option>
-                <option>Hybrid</option>
-                <option>Remote</option>
-                <option>Part-Time</option>
-                <option>Intern</option>
-                <option>Contractual</option>
-              </select>
-            </div>
+            <select
+              className="select select-bordered"
+              value={formData.jobType}
+              onChange={(e) =>
+                setFormData({ ...formData, jobType: e.target.value })
+              }
+            >
+              <option>Full-Time</option>
+              <option>Hybrid</option>
+              <option>Remote</option>
+              <option>Part-Time</option>
+              <option>Intern</option>
+              <option>Contractual</option>
+            </select>
 
-            <div className="form-control w-full">
-              <label htmlFor="category" className="label font-semibold">
-                Category
-              </label>
-              <input
-                id="category"
-                type="text"
-                placeholder="Enter Job Category"
-                className="input input-bordered focus:input-primary"
-                onChange={(e) =>
-                  setFormData({ ...formData, category: e.target.value })
-                }
-                value={formData.category}
-              />
-            </div>
+            <input
+              className="input input-bordered"
+              placeholder="Category"
+              value={formData.category}
+              onChange={(e) =>
+                setFormData({ ...formData, category: e.target.value })
+              }
+            />
 
-            <div className="form-control w-full">
-              <label htmlFor="deadline" className="label font-semibold">
-                Application Deadline
-              </label>
-              <input
-                id="deadline"
-                type="date"
-                className="input input-bordered focus:input-primary"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    applicationDeadline: e.target.value,
-                  })
-                }
-                value={formData.applicationDeadline}
-              />
-            </div>
+            <input
+              type="date"
+              className="input input-bordered"
+              value={formData.applicationDeadline}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  applicationDeadline: e.target.value,
+                })
+              }
+            />
           </div>
         )}
 
-        {/* STEP 2: JOB DETAILS */}
-        {/* STEP 2: JOB DETAILS */}
+        {/* STEP 2 */}
         {step === 2 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 animate-fadeIn">
-            <h2 className="col-span-2 text-2xl font-bold mb-4 border-b pb-2 text-secondary">
-              Requirements & Pay
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-fadeIn">
+            <h2 className="col-span-2 text-2xl font-bold border-b pb-2 text-secondary">
+              Job Details
             </h2>
 
-            {/* Description - Full Width */}
-            <div className="form-control col-span-2">
-              <label htmlFor="description" className="label">
-                <span className="label-text font-semibold">
-                  Job Description
-                </span>
-              </label>
-              <textarea
-                id="description"
-                className="textarea textarea-bordered h-32 focus:textarea-secondary text-base"
-                placeholder="Detailed explanation of the role..."
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
-                value={formData.description}
-              ></textarea>
-            </div>
+            <textarea
+              className="textarea textarea-bordered col-span-2 h-32"
+              placeholder="Job Description"
+              value={formData.description}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+            />
 
-            {/* Salary Section - Split Row */}
-            <div className="form-control w-full">
-              <label htmlFor="minSalary" className="label">
-                <span className="label-text font-semibold">
-                  Min Salary (BDT)
-                </span>
-              </label>
-              <input
-                id="minSalary"
-                type="number"
-                placeholder="e.g. 40000"
-                className="input input-bordered focus:input-secondary"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    salaryRange: {
-                      ...formData.salaryRange,
-                      min: e.target.value,
-                    },
-                  })
-                }
-                value={formData.salaryRange.min}
-              />
-            </div>
+            <input
+              type="number"
+              className="input input-bordered"
+              placeholder="Min Salary"
+              value={formData.salaryRange.min}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  salaryRange: {
+                    ...formData.salaryRange,
+                    min: e.target.value,
+                  },
+                })
+              }
+            />
 
-            <div className="form-control w-full">
-              <label htmlFor="maxSalary" className="label">
-                <span className="label-text font-semibold">
-                  Max Salary (BDT)
-                </span>
-              </label>
-              <input
-                id="maxSalary"
-                type="number"
-                placeholder="e.g. 80000"
-                className="input input-bordered focus:input-secondary"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    salaryRange: {
-                      ...formData.salaryRange,
-                      max: e.target.value,
-                    },
-                  })
-                }
-                value={formData.salaryRange.max}
-              />
-            </div>
+            <input
+              type="number"
+              className="input input-bordered"
+              placeholder="Max Salary"
+              value={formData.salaryRange.max}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  salaryRange: {
+                    ...formData.salaryRange,
+                    max: e.target.value,
+                  },
+                })
+              }
+            />
 
-            {/* Requirements - Full Width */}
-            <div className="form-control col-span-2 mt-2">
-              <label htmlFor="requirements" className="label">
-                <span className="label-text font-semibold">Requirements</span>
-              </label>
-              <input
-                id="requirements"
-                type="text"
-                placeholder="React, Node.js, MongoDB (comma separated)"
-                className="input input-bordered focus:input-secondary"
-                onChange={(e) =>
-                  setFormData({ ...formData, requirements: e.target.value })
-                }
-                value={formData.requirements}
-              />
-              <label className="label">
-                <span className="label-text-alt text-gray-500 italic">
-                  Separate skills with a comma
-                </span>
-              </label>
-            </div>
+            <input
+              className="input input-bordered col-span-2"
+              placeholder="Requirements (comma separated)"
+              value={formData.requirements}
+              onChange={(e) =>
+                setFormData({ ...formData, requirements: e.target.value })
+              }
+            />
 
-            {/* Responsibilities - Full Width */}
-            <div className="form-control col-span-2">
-              <label htmlFor="responsibilities" className="label">
-                <span className="label-text font-semibold">
-                  Key Responsibilities
-                </span>
-              </label>
-              <input
-                id="responsibilities"
-                type="text"
-                placeholder="Develop UI, API Integration, Testing"
-                className="input input-bordered focus:input-secondary"
-                onChange={(e) =>
-                  setFormData({ ...formData, responsibilities: e.target.value })
-                }
-                value={formData.responsibilities}
-              />
-            </div>
+            <input
+              className="input input-bordered col-span-2"
+              placeholder="Responsibilities (comma separated)"
+              value={formData.responsibilities}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  responsibilities: e.target.value,
+                })
+              }
+            />
           </div>
         )}
 
-        {/* STEP 3: HR & COMPANY */}
+        {/* STEP 3 */}
         {step === 3 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-fadeIn">
-            <h2 className="col-span-2 text-2xl font-bold mb-2 border-b pb-2">
-              Company & HR Details
+            <h2 className="col-span-2 text-2xl font-bold border-b pb-2">
+              Company & HR
             </h2>
 
-            <div className="form-control">
-              <label htmlFor="companyName" className="label font-semibold">
-                Company Name
-              </label>
-              <input
-                id="companyName"
-                type="text"
-                placeholder="Enter Company Name"
-                className="input input-bordered focus:input-accent"
-                onChange={(e) =>
-                  setFormData({ ...formData, company: e.target.value })
-                }
-                value={formData.company}
-              />
-            </div>
+            <input
+              className="input input-bordered"
+              placeholder="Company Name"
+              value={formData.company}
+              onChange={(e) =>
+                setFormData({ ...formData, company: e.target.value })
+              }
+            />
 
-            <div className="form-control">
-              <label htmlFor="hrName" className="label font-semibold">
-                HR Name
-              </label>
-              <input
-                id="hrName"
-                type="text"
-                placeholder="Enter HR Manager Name"
-                className="input input-bordered focus:input-accent"
-                onChange={(e) =>
-                  setFormData({ ...formData, hr_name: e.target.value })
-                }
-                value={formData.hr_name}
-              />
-            </div>
+            <input
+              className="input input-bordered"
+              placeholder="HR Name"
+              value={formData.hr_name}
+              onChange={(e) =>
+                setFormData({ ...formData, hr_name: e.target.value })
+              }
+            />
 
-            <div className="form-control col-span-2">
-              <label htmlFor="hrEmail" className="label font-semibold">
-                HR Email
-              </label>
-              <input
-                id="hrEmail"
-                type="email"
-                placeholder="Enter HR Contact Email"
-                className="input input-bordered focus:input-accent"
-                onChange={(e) =>
-                  setFormData({ ...formData, hr_email: e.target.value })
-                }
-                value={formData.hr_email}
-              />
-            </div>
+            <input
+              type="email"
+              className="input input-bordered col-span-2"
+              placeholder="HR Email"
+              value={formData.hr_email}
+              onChange={(e) =>
+                setFormData({ ...formData, hr_email: e.target.value })
+              }
+            />
 
-            <div className="form-control col-span-2">
-              <label htmlFor="logoUrl" className="label font-semibold">
-                Company Logo URL
-              </label>
-              <input
-                id="logoUrl"
-                type="text"
-                placeholder="Enter Company Logo Image URL"
-                className="input input-bordered focus:input-accent"
-                onChange={(e) =>
-                  setFormData({ ...formData, company_logo: e.target.value })
-                }
-                value={formData.company_logo}
-              />
-            </div>
+            <input
+              className="input input-bordered col-span-2"
+              placeholder="Company Logo URL"
+              value={formData.company_logo}
+              onChange={(e) =>
+                setFormData({ ...formData, company_logo: e.target.value })
+              }
+            />
           </div>
         )}
 
-        {/* NAVIGATION BUTTONS */}
-        <div className="flex justify-between mt-12 pt-6 border-t">
+        {/* Buttons */}
+        <div className="flex justify-between mt-12 border-t pt-6">
           {step > 1 && (
             <button
               type="button"
               onClick={prevStep}
-              className="btn btn-outline px-8"
+              className="btn btn-outline"
             >
               Back
             </button>
           )}
+
           {step < 3 ? (
             <button
               type="button"
               onClick={nextStep}
-              className="btn btn-primary ml-auto px-8"
+              className="btn btn-primary ml-auto"
             >
               Next Step
             </button>
           ) : (
             <button
               type="submit"
-              className="btn btn-success ml-auto text-white px-10"
+              className="btn btn-success ml-auto text-white"
             >
               Post Job
             </button>
