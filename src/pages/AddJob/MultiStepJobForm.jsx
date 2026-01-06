@@ -1,4 +1,6 @@
+import axios from "axios";
 import React, { useState } from "react";
+import Swal from "sweetalert2";
 
 const MultiStepJobForm = () => {
   const [step, setStep] = useState(1);
@@ -17,6 +19,7 @@ const MultiStepJobForm = () => {
     hr_email: "",
     hr_name: "",
     company_logo: "",
+    status: "active",
   });
 
   /* ---------------- STEP VALIDATION ---------------- */
@@ -82,8 +85,16 @@ const MultiStepJobForm = () => {
         .filter(Boolean),
     };
 
-    console.log("Final Job Data:", finalData);
-    alert("Job Posted Successfully!");
+    axios
+      .post("http://localhost:3000/jobs", finalData)
+      .then(() =>
+        Swal.fire({
+          title: "Your Job is Submitted",
+          icon: "success",
+          draggable: true,
+        })
+      )
+      .catch((err) => console.log(err));
   };
 
   return (
