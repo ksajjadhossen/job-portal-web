@@ -1,19 +1,11 @@
 import React, { use } from "react";
+import { Link } from "react-router";
 
 const List = ({ jobsCreatedByPromise }) => {
   const applications = use(jobsCreatedByPromise);
 
-  // Calculate statistics safely
-  const stats = (applications || []).reduce((acc, app) => {
-    if (app.job_id) {
-      acc[app.job_id] = (acc[app.job_id] || 0) + 1;
-    }
-    return acc;
-  }, {});
-
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      {/* Header - Simple & Professional */}
       <div className="mb-8 border-b border-gray-800 pb-6">
         <h1 className="text-2xl font-semibold text-white">
           Application Management
@@ -24,7 +16,6 @@ const List = ({ jobsCreatedByPromise }) => {
         </p>
       </div>
 
-      {/* Table Container - Clean Design */}
       <div className="bg-[#111827] border border-gray-800 rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
@@ -36,8 +27,9 @@ const List = ({ jobsCreatedByPromise }) => {
                 <th className="px-6 py-4 font-medium text-gray-400">
                   Job Title
                 </th>
+                {/* Changed Header */}
                 <th className="px-6 py-4 font-medium text-gray-400 text-center">
-                  Total Apps
+                  Action
                 </th>
                 <th className="px-6 py-4 font-medium text-gray-400 text-right">
                   Resume
@@ -51,7 +43,6 @@ const List = ({ jobsCreatedByPromise }) => {
                     key={app._id}
                     className="hover:bg-gray-800/30 transition-colors"
                   >
-                    {/* Applicant Info */}
                     <td className="px-6 py-4">
                       <div className="text-white font-medium">
                         {app.applicant}
@@ -76,7 +67,6 @@ const List = ({ jobsCreatedByPromise }) => {
                       </div>
                     </td>
 
-                    {/* Job Reference with fix for .slice() error */}
                     <td className="px-6 py-4">
                       <div className="text-gray-300">{app.title}</div>
                       <div className="text-[10px] text-gray-500 font-mono mt-1 uppercase">
@@ -84,20 +74,22 @@ const List = ({ jobsCreatedByPromise }) => {
                       </div>
                     </td>
 
-                    {/* Stats */}
+                    {/* New "View Applications" Link */}
                     <td className="px-6 py-4 text-center">
-                      <span className="text-white font-medium">
-                        {stats[app.job_id] || 0}
-                      </span>
+                      <Link
+                        to={`/applications/${app._id}`}
+                        className="text-blue-400 hover:text-blue-300 underline underline-offset-4 decoration-blue-400/30"
+                      >
+                        View Applications
+                      </Link>
                     </td>
 
-                    {/* Action - Simple Button */}
                     <td className="px-6 py-4 text-right">
                       <a
                         href={app.resume}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-block px-4 py-1.5 border border-gray-700 text-gray-300 rounded hover:bg-white hover:text-black transition-all text-xs"
+                        className="inline-block px-4 py-1.5 border border-gray-800 text-gray-300 rounded hover:bg-white hover:text-black transition-all text-xs"
                       >
                         Review CV
                       </a>
