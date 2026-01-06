@@ -1,9 +1,31 @@
+import axios from "axios";
 import React from "react";
 import { useLoaderData, useParams } from "react-router";
+import Swal from "sweetalert2"; // Optional: for nice alerts
 
 const ViewApplications = () => {
   const applications = useLoaderData();
   const { job_id } = useParams();
+
+  // Event Handler to update status
+  const handleStatusUpdate = (e, id) => {
+    const newStatus = e.target.value;
+
+    axios
+      .patch(`http://localhost:3000/applications/${id}`, {
+        status: newStatus,
+      })
+      .then((res) => {
+        if (res.data.modifiedCount) {
+          Swal.fire({
+            title: "Your status updated",
+            icon: "success",
+            draggable: true,
+          });
+        }
+      })
+      .catch((err) => console.log(err));
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -16,10 +38,11 @@ const ViewApplications = () => {
           <table className="w-full text-left text-sm text-gray-300">
             <thead className="bg-gray-900/50 border-b border-gray-800 text-gray-400 uppercase text-xs">
               <tr>
-                <th className="px-6 py-4 font-medium">#</th>
-                <th className="px-6 py-4 font-medium">Applicant Email</th>
-                <th className="px-6 py-4 font-medium">Resume</th>
-                <th className="px-6 py-4 font-medium text-right">Links</th>
+                <th className="px-6 py-4">#</th>
+                <th className="px-6 py-4">Applicant Email</th>
+                <th className="px-6 py-4">Resume/Message</th>
+                <th className="px-6 py-4">Update Status</th>
+                <th className="px-6 py-4 text-right">Links</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-800">
@@ -36,6 +59,21 @@ const ViewApplications = () => {
                     <td className="px-6 py-4 max-w-xs truncate">
                       {app.message || "No message provided"}
                     </td>
+
+                    {/* Status Update Dropdown */}
+                    <td className="px-6 py-4">
+                      <select
+                        defaultValue={app.status || "Pending"}
+                        onChange={(e) => handleStatusUpdate(e, app._id)}
+                        className="bg-gray-900 border border-gray-700 text-white text-xs rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                      >
+                        <option value="Pending">Pending</option>
+                        <option value="Hired">Hired</option>
+                        <option value="Rejected">Rejected</option>
+                        <option value="Interview Call">Interview Call</option>
+                      </select>
+                    </td>
+
                     <td className="px-6 py-4 text-right">
                       <div className="flex justify-end gap-3 text-xs">
                         <a
@@ -59,7 +97,7 @@ const ViewApplications = () => {
               ) : (
                 <tr>
                   <td
-                    colSpan="4"
+                    colSpan="5"
                     className="px-6 py-10 text-center text-gray-500"
                   >
                     No one has applied for this job yet.
