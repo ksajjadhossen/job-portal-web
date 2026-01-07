@@ -11,6 +11,7 @@ import {
 import { useState } from "react";
 import { auth } from "../../firebase/firebase.init";
 import { useEffect } from "react";
+import axios from "axios";
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -26,6 +27,15 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const subscribe = onAuthStateChanged(auth, (user) => {
+      if (user?.email) {
+        const userData = { email: user.email };
+        axios
+          .post("http://localhost:3000/jwt", userData, {
+            withCredentials: true,
+          })
+          .then((res) => console.log("Data is here", res.data))
+          .catch((res) => console.log(res));
+      }
       setUser(user);
       setLoading(false);
       console.log("user with the auth state is changed");
@@ -37,9 +47,7 @@ const AuthProvider = ({ children }) => {
 
   const signOutUser = () => {
     signOut(auth)
-      .then(() => {
-        console.log("signOut successful");
-      })
+      .then(() => {})
       .catch((error) => {
         console.log(error.message);
       });
